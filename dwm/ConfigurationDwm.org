@@ -1,0 +1,28 @@
+#+title: My Dwm Configuration
+#+Startup content
+
+
+* Scripts DWM
+** [[https://dwm.suckless.org/patches/taggrid/][Tagrid]]
+** [[https://dwm.suckless.org/patches/alpha/][alpha]]
+** [[https://dwm.suckless.org/patches/attachaside/][attachaside]]
+** [[https://dwm.suckless.org/patches/cfacts/][cfacts]]
+** [[https://dwm.suckless.org/patches/restartsig/][restartsig]]
+** [[https://dwm.suckless.org/patches/stacker/][stacker]]
+
+* Volume Shortcuts
+#include <X11/XF86keysym.h>
+
+
+// ...
+
+static const char *volup[]   = { "amixer", "-q", "set", "Master", "5%+", "unmute", NULL };
+static const char *voldown[] = { "amixer", "-q", "set", "Master", "5%-", "unmute", NULL };
+static const char *volmute[] = { "amixer", "-q", "set", "Master", "toggle",      NULL };
+
+// ...
+
+{ MODKEY,                       XK_F1,     spawn,          {.v = volmute } },
+{ MODKEY,                       XK_F2,     spawn,          {.v = voldown } },
+{ MODKEY,                       XK_F3,     spawn,          {.v = volup   } },
+
