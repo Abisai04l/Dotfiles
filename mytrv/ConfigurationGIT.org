@@ -1,0 +1,28 @@
+* QUE ES GIT
+** Es un sistema de control de versiones y es un sistema que controla y administra las distintas versiones de un programa, para controlar distintos cambios de un programa , git fue creado por linux truvals, y lo creo gracias al control del kernel de linux, git te ayuda a tener un listado de todo loq que se va haciendo, git es un sistema de control distribuido
+
+
+*** Basic Commands
+**** git config --global user.name "Tu name"
+**** git config --global user.name "Tu_Correo.com"
+**** git init --> Empezar 
+**** git add <file> --> Pasar Archivos del Working_Directory al Staging_Area
+**** git status --> En que estado estan
+**** git commit --> Pasar del Staging_Area al repository 
+**** git push --> Subirlo a un repository remoto
+**** git pull --> Si trabajas con varios desarrolladores te trae los cambios
+**** git clone --> Hacer una copia desde el servidor central al computador
+
+***** Schemes
+#+begin_src plantuml  :file diagrama.png
+    @startuml
+    (*) --> "Working_Directory"
+    -->[Git ADD] "Staging_Area"
+    -->[Git Commit] "Repository"
+    @enduml
+  #+end_src
+
+#+RESULTS:
+[[file:diagrama.png]]
+
+
