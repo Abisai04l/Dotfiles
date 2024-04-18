@@ -1,0 +1,8 @@
+#+title: My Network Configuration
+
+* ANALYZING AND MANAGIN NETWORKS
+*** Comprender las redes es crucial para cualquier aspirandte a hacker. En muchas situaciones, estaras pirateando algo atraves de una red y un buen hacker necesita saber como conectarse e interactuar con esa red. Por ejemplo, es posible que necesite conectarse a una computadora con su direccion de protocolo de internet (IP) ocualta a la vista, o puede que necesite redirigir las consultas del sistema de nombres de dominio (DNS) de un objetivo a su sistema. Este tipo de tareas son relativamente simples pero requieren un poco de conocimientos sobre redes Linux.
+
+
+** ANALIZANDO REDES CON IFCONFIG
+*** El comando ifconfig es una de las herramientas mas basicas para examinar e interactuar con interfaces de redes activas. Puedes usarlo para consultar sus conexiones de red activas simplemente ingresando ifconfig en la terminal 
