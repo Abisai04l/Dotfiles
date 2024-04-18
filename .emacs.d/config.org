@@ -76,6 +76,11 @@
               (auto-package-update-maybe)
               (auto-package-update-at-time "09:00"))
 #+end_src
+** Cl-lib
+#+begin_src emacs-lisp
+  (require 'cl-lib)
+#+end_src
+
 * Doom-Themes [[https://github.com/hlissner/emacs-doom-themes/tree/master][Link]]
 #+begin_src emacs-lisp
 
@@ -322,16 +327,22 @@
 
 * Projectile [[https://github.com/bbatsov/projectile][Link]]
 #+begin_src emacs-lisp
+   (use-package projectile
+    :demand t
+    :config
+    (projectile-mode) ; Activar el modo de proyecto
+    (projectile-global-mode 1) ; Activar el modo global de projectile
+    (setq projectile-project-search-path '(("~/-/" . 4) ("~/Projects/" . 4)))
+    (setq projectile-switch-project-action #'projectile-dired)
+    :bind (("C-M-p" . projectile-find-file)
+           ("C-c p" . projectile-command-map)))
 
-  (use-package projectile
-  :demand t
-  :config
-  (projectile-mode)
-  (setq projectile-project-search-path '("~/Projects"))
-  (setq projectile-switch-project-action #'projectile-dired)
-  :bind (("C-M-p" . projectile-find-file)
-         ("C-c p" . projectile-command-map)))
-#+end_src
+  (use-package helm-projectile
+    :ensure t
+    :config (helm-projectile-on))
+
+
+    #+end_src
 * Telegram [[https://github.com/zevlg/telega.el][Link]]
 #+begin_src emacs-lisp
 
@@ -398,10 +409,13 @@
   ;; To disable shortcut "jump" indicators for each section, set
   (setq dashboard-show-shortcuts nil)
 
-  (setq dashboard-items '((recents   . 5)
-                          (bookmarks . 5)
-                          (projects  . 5)))
-           
+
+  (setq dashboard-items '((projects   . 5)
+                          (recents . 5)
+                          (bookmarks  . 5)))
+
+
+
 
 
 
