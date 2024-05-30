@@ -35,7 +35,11 @@
 #+end_src
 ** Keyboard
 #+begin_src emacs-lisp
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+
+  (setq mouse-drag-and-drop-region-cross-program t
+        dired-mouse-drag-files t)
 #+end_src
 ** Font Configuration
 #+begin_src emacs-lisp
@@ -46,7 +50,7 @@
   ;;(set-face-attribute 'fixed-pitch nil :font "Fira Code Retina" :height 101)
 
   ;; Set the variable pitch face
-  ;;(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 101 :weight 'regular)
+  (set-face-attribute 'variable-pitch nil :font "hack" :height 101 :weight 'regular)
 
 #+end_src 
 
@@ -86,7 +90,7 @@
 
     (use-package doom-themes
       :init
-      (load-theme 'doom-nord t))
+      (load-theme 'doom-one t))
 
   (use-package doom-modeline
     :init (doom-modeline-mode 1)
@@ -223,33 +227,69 @@
 
 #+end_src
 * Web
+** Astro 
+#+begin_src emacs-lisp
+(define-derived-mode astro-ts-mode web-mode "astro-ts")
+(setq auto-mode-alist
+      (append '(("\\.astro\\'" . astro-ts-mode))
+              auto-mode-alist))
+#+end_src 
+***** Eglot
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure t
+    :config
+    ;; Añadir configuración para astro-ts-mode
+    (add-to-list 'eglot-server-programs
+                 '(astro-ts-mode . ("astro-ls" "--stdio"
+                                    :initializationOptions
+                                    (:typescript (:tsdk "./node_modules/typescript/lib")))))
+    ;; Configurar eglot para HTML
+    (add-to-list 'eglot-server-programs
+                 '(html-mode . ("/usr/bin/vscode-html-language-server" "--stdio")))
+
+    ;; Si no quieres que eglot se inicie automáticamente con css-mode, scss-mode y less-mode, comenta o elimina las siguientes líneas
+    (add-to-list 'eglot-server-programs
+                 '((css-mode scss-mode less-mode) . ("/usr/bin/vscode-css-language-server" "--stdio")))
+
+    :init
+    ;; auto start eglot para astro-ts-mode
+    (add-hook 'astro-ts-mode-hook 'eglot-ensure)
+
+    ;; auto start eglot para HTML
+    (add-hook 'html-mode-hook 'eglot-ensure))
+#+end_src
 **  Web-Mode [[https://github.com/fxbois/web-mode/tree/master][Link]]
 #+begin_src emacs-lisp
   (use-package web-mode
-    :config
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (progn
-      (setq web-mode-engines-alist
-            '(("django"  . "\\.html\\'")))
-      (setq web-mode-ac-sources-alist
-            '(("css" . (ac-source-css-property))
-              ("html" . (ac-source-work-in-buffer ac-source-abbrev))))
-      (setq web-mode-enable-auto-closing t)
-      (setq web-mode-enable-auto-quoting t)
-      (setq web-mode-enable-current-column-highlight t)
-      (setq web-mode-enable-current-element-highlight t)))
+  :config
+  ;; Add .astro files to web-mode
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.astro\\'" . web-mode))
+  (progn
+    (setq web-mode-engines-alist
+          '(("django"  . "\\.html\\'")))
+    (setq web-mode-ac-sources-alist
+          '(("css" . (ac-source-css-property))
+            ("html" . (ac-source-work-in-buffer ac-source-abbrev))))
+    (setq web-mode-enable-auto-closing t)
+    (setq web-mode-enable-auto-quoting t)
+    (setq web-mode-enable-current-column-highlight t)
+    (setq web-mode-enable-current-element-highlight t)))
 #+end_src
-
 ** Emmet [[https://github.com/smihica/emmet-mode/tree/master][Link]]
 #+begin_src emacs-lisp
-
   (use-package emmet-mode
-    :defer 5
-    :hook
-    (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
-    (web-mode . emmet-mode) ;; Auto-start on any markup modes
-    (css-mode . emmet-mode)) ;; enable Emmet's css abbreviation.
-#+end_src
+  :defer 5
+  :hook
+  (sgml-mode . emmet-mode) ;; Auto-start on any markup modes
+  (web-mode . emmet-mode)  ;; Auto-start on any markup modes
+  (css-mode . emmet-mode)  ;; Enable Emmet's CSS abbreviation
+  (astro-ts-mode . emmet-mode)
+  (php-mode . emmet-mode)
+  (js-mode . emmet-mode)
+  (typescript-mode . emmet-mode))
+ #+end_src
 ** Company [[https://github.com/company-mode/company-mode/tree/master][Link]]
 #+begin_src emacs-lisp
   (use-package company
@@ -258,29 +298,64 @@
     (after-init . global-company-mode))
 
 #+end_src
-** Skewer-Mode [[https://github.com/skeeto/skewer-mode/tree/master][Link]]
+** Prettier-JS [[https://github.com/prettier/prettier-emacs][Link]]
 #+begin_src emacs-lisp
-  (use-package skewer-mode
-    :defer 5
-    :hook
-    (css-mode .skewer-css-mode)
-    (html-mode . skewer-html-mode))
-
+(use-package prettier
+  :ensure t
+  :hook ((web-mode . prettier-mode)
+         (css-mode . prettier-mode)
+         (js-mode . prettier-mode)
+         (typescript-mode . prettier-mode)
+         (php-mode . prettier-mode)))
 #+end_src
-** Simple-Httpd [[https://github.com/skeeto/emacs-web-server/tree/master][Link]]
+** Flycheck [[https://github.com/flycheck/flycheck][Link]]
 #+begin_src emacs-lisp
-    (use-package simple-httpd
-      :defer t)
-
+  (use-package flycheck
+    :ensure t
+    :init (global-flycheck-mode))
 #+end_src
-*** JavaScript 
-***** Rjsx-Mode [[https://github.com/felipeochoa/rjsx-mode][Link]]
+** Yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+#+end_src
+
+** Lsp-Ui
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode)
+#+end_src
+** Lsp-Mode
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+  :ensure t
+  :commands (lsp lsp-deferred)
+  :hook ((web-mode . lsp-deferred)
+         (css-mode . lsp-deferred)
+         (js-mode . lsp-deferred)
+         (typescript-mode . lsp-deferred)
+         (php-mode . lsp-deferred))
+  :init
+  (setq lsp-keymap-prefix "C-c l"))
+#+end_src
+** JavaScript 
+***** Rjsx-Mode  [[https://github.com/felipeochoa/rjsx-mode][Link]]
 #+begin_src emacs-lisp
  (use-package rjsx-mode
 	   :mode "\\.js\\'")
 #+end_src
-***** Tide [[https://github.com/ananthakumaran/tide][Link]]
+***** Typescript  [[https://github.com/ananthakumaran/tide][Link]]
 #+begin_src emacs-lisp
+  (use-package tide
+    :ensure t
+    :after (rjsx-mode company flycheck)
+    :hook ((rjsx-mode . setup-tide-mode)
+           (typescript-mode . setup-tide-mode)
+           (js-mode . setup-tide-mode)))
+
   (defun setup-tide-mode ()
     (interactive)
     (tide-setup)
@@ -289,30 +364,32 @@
     (eldoc-mode +1)
     (tide-hl-identifier-mode +1)
     (company-mode +1))
-  (setq company-tooltip-align-annotations t)
-  (add-hook 'before-save-hook 'tide-format-before-save)
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
-  (use-package tide 
-    :defer 5
-    :after (rjsx-mode company flycheck)
-    :hook (rjsx-mode . setup-tide-mode))
-#+end_src
-***** Prettier-JS [[https://github.com/prettier/prettier-emacs][Link]]
-#+begin_src emacs-lisp
-  (use-package prettier-js
-    :defer 5
-    :after (rjsx-mode)
-    :hook (rjsx-mode . prettier-js-mode))
+  ;; Rjsx Mode para JS
+  (use-package rjsx-mode
+    :ensure t
+    :mode "\\.js\\'")
+
+  ;; Configuración de Typescript Mode
+  (use-package typescript-mode
+    :ensure t
+    :mode "\\.ts\\'")
+
 
 #+end_src
-***** Flycheck [[https://github.com/flycheck/flycheck][Link]]
+** Css
 #+begin_src emacs-lisp
-  (use-package flycheck
-    :defer 5
-    :config
-    (global-flycheck-mode))
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+  (use-package css-mode
+    :ensure t
+    :mode "\\.css\\'")
+#+end_src
+
+** PHP
+#+begin_src emacs-lisp
+;; Configuración de PHP Mode
+(use-package php-mode
+  :ensure t
+  :mode "\\.php\\'")
 
 #+end_src
 * Magit [[https://magit.vc/][Link]]
@@ -384,9 +461,9 @@
 
   ;; Set the title
 
-  (setq dashboard-banner-logo-title "         Welcome to my Emacs\n Jason Arriaza. All Rights Reserved. ")
+  (setq dashboard-banner-logo-title "      Welcome to my Emacs\n Jeet-u. All Rights Reserved. ")
   ;; Set the banner
-  (setq dashboard-startup-banner "~/Downloads/pngaaa1.png")
+  (setq dashboard-startup-banner "~/Downloads/milogo.png")
   ;; Value can be:
   ;;  - 'official which displays the official emacs logo.
   ;;  - 'logo which displays an alternative emacs logo.
@@ -403,7 +480,7 @@
   ;; Content is not centered by default. To center, set
   ;; (setq dashboard-center-content t)
   ;; vertically center content
-  (setq dashboard-center-content nil)
+  (setq dashboard-center-content t)
   (setq dashboard-vertically-center-content t)
 
   ;; To disable shortcut "jump" indicators for each section, set
@@ -431,9 +508,10 @@
                                     dashboard-insert-footer))
 
 
-  (setq dashboard-display-icons-p t)     ; display icons on both GUI and terminal
-  (setq dashboard-icon-type 'nerd-icons) ; use `nerd-icons' package
+  (setq dashboard-icon-type 'all-the-icons)
 
+  ;;(setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
 
   (setq dashboard-navigator-buttons
         `(
@@ -442,16 +520,12 @@
             "Homepage"
             "Browse homepage"
             (lambda (&rest _) (browse-url "https://github.com/Jeet-u")))
-           (,(all-the-icons-faicon "stack-overflow" :height 1.1 :v-adjust 0.0)
-            "Stack-Overflow"
-            ""
-            (lambda (&rest _) (browse-url "https://stackoverflow.com")))
            (,(all-the-icons-fileicon "gentoo" :height 1.1 :v-adjust 0.0)
             "Gentoo"
             ""
             (lambda (&rest _) (browse-url "https://wiki.gentoo.org/wiki/Handbook:Main_Page")))
            (,(all-the-icons-faicon "envelope" :height 1.1 :v-adjust 0.0)
-            "Gmail"
+            "Proton"
             ""
             (lambda (&rest _) (browse-url "https://protonmail.com")))
            (,(all-the-icons-faicon "firefox" :height 1.1 :v-adjust 0.0)
@@ -460,8 +534,32 @@
             (lambda (&rest _) (start-process "nyxt" nil "/usr/bin/nyxt"))))
           ))
 
-  #+end_src
 
+  (require 'bookmark)
+
+#+end_src
+
+* Vterm-toogle [[https://github.com/jixiuf/vterm-toggle?tab=readme-ov-file][Link]]
+#+begin_src emacs-lisp
+
+  (use-package vterm
+  :ensure t)
+  
+  (setq vterm-toggle-fullscreen-p nil)
+  (add-to-list 'display-buffer-alist
+               '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'vterm-mode)
+                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                  (display-buffer-reuse-window display-buffer-at-bottom)
+                  ;;(display-buffer-reuse-window display-buffer-in-direction)
+                  ;;display-buffer-in-direction/direction/dedicated is added in emacs27
+                  ;;(direction . bottom)
+                  ;;(dedicated . t) ;dedicated is supported in emacs27
+                  (reusable-frames . visible)
+                  (window-height . 0.3)))
+#+end_src
 * Ace-Window [[https://github.com/abo-abo/ace-window][Link]]
 #+begin_src emacs-lisp
   (use-package ace-window

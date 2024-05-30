@@ -1,8 +1,0 @@
-cd .config/
-ls
-git clon https://github.com/tdlib/td.git
-git clone https://github.com/tdlib/td.git
-ccd
-clear
-cd td/
-sudo dhcpcd enp0s26u1u6
